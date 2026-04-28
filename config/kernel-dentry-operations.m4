@@ -47,6 +47,33 @@ AC_DEFUN([ZFS_AC_KERNEL_D_SET_D_OP], [
 	])
 ])
 
+
+dnl #
+dnl # 7.1-rc1 change
+dnl # dentry->d_u union now unnamed
+dnl #
+
+AC_DEFUN([ZFS_AC_KERNEL_SRC_D_U_UNION], [
+	ZFS_LINUX_TEST_SRC([d_u_union], [
+		#include <linux/dcache.h>
+	], [
+		struct dentry* dentry;
+		typeof(dentry->d_u);
+	])
+])
+
+AC_DEFUN([ZFS_AC_KERNEL_D_U_UNION], [
+	AC_MSG_CHECKING([whether d_u is named])
+	ZFS_LINUX_TEST_RESULT([d_u_union], [
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_D_U_UNION, 1,
+		    [Define if d_u is named])
+	], [
+		AC_MSG_RESULT(no)
+	])
+])
+
+
 dnl #
 dnl # 6.17 API change
 dnl # sb->s_d_op removed; set_default_d_op(sb, dop) added
@@ -74,10 +101,12 @@ AC_DEFUN([ZFS_AC_KERNEL_SRC_DENTRY], [
         ZFS_AC_KERNEL_SRC_D_OBTAIN_ALIAS
         ZFS_AC_KERNEL_SRC_D_SET_D_OP
         ZFS_AC_KERNEL_SRC_SET_DEFAULT_D_OP
+	ZFS_AC_KERNEL_SRC_D_U_UNION
 ])
 
 AC_DEFUN([ZFS_AC_KERNEL_DENTRY], [
         ZFS_AC_KERNEL_D_OBTAIN_ALIAS
         ZFS_AC_KERNEL_D_SET_D_OP
         ZFS_AC_KERNEL_SET_DEFAULT_D_OP
+	ZFS_AC_KERNEL_D_U_UNION
 ])
